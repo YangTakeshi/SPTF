@@ -162,7 +162,7 @@ private:
 		while (negVer.size() < negSamples) {
 			if (count < baseList.size()) {
 				default_random_engine e;
-				uniform_int_distribution<double> u(0, 1);
+				uniform_real_distribution<double> u(0.0, 1.0);
 				double ran = u(e);
 				int count2 = 0;
 				auto i = baseList.begin();
