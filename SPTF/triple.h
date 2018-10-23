@@ -39,28 +39,13 @@ public:
 		this->type = t;
 	}
 	string getUser() {
-		if (vertexType == 0) {
-			return str;
-		}
-		else {
-			return nullptr;
-		}
+		return str;
 	}
 	string getItem() {
-		if (vertexType == 1) {
-			return str;
-		}
-		else {
-			return nullptr;
-		}
+		return str;
 	}
 	int getType() {
-		if (vertexType == 2) {
-			return type;
-		}
-		else {
-			return 0;
-		}
+		return type;
 	}
 	bool operator<(const Vertex& other)  const {
 		if (vertexType == 1 || vertexType == 0)return this->str < other.str;

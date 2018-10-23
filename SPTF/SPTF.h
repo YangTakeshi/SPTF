@@ -172,6 +172,7 @@ private:
 					count2++;
 				}
 				Vertex v = i->first;
+				negVer.push_back(v);
 			}
 			else
 			{
@@ -184,7 +185,7 @@ private:
 			update(user, item, type, negVer, flag);
 		}
 		else if (flag == 1) {
-			update(item, user, type, negVer, flag);
+			update(user, item, type, negVer, flag);
 		}
 	}
 	void update(Vertex &v1, Vertex &v2, Vertex type, vector<Vertex> &negs ,int const &flag) {
@@ -199,7 +200,7 @@ private:
 			argV2 = itemArgs.find(v2.getItem())->second;
 		}
 		else if (flag == 1) {
-			argV1 = itemArgs.find(v1.getItem())->second;
+			argV1 = itemArgs.find(v1.getItem())->second;//bug 
 			argV2 = userArgs.find(v2.getUser())->second;
 		}
 		else {
@@ -247,20 +248,22 @@ private:
 		Eigen::VectorXd gg = Eigen::VectorXd(negSamples);
 		Eigen::VectorXd E = Eigen::VectorXd::Ones(negSamples);
 		xx = negMat * vecV1 + negMat * vecT + E*(vecT.transpose()*vecV1);
-		Sigmoid(x, x);
+		Sigmoid(xx, xx);
 		gg = -xx * initLr;
-		vecv1 = vecv1 + gg.transpose()*(negMat + E * vecT.transpose());
-		vect = vect + gg.transpose()*(negMat + E * vecV1.transpose());
+		vecv1 = vecv1 + (gg.transpose()*(negMat + E * vecT.transpose())).transpose();
+		vect = vect + (gg.transpose()*(negMat + E * vecV1.transpose())).transpose();
 		//开始更新负例影响
-		negMat = negMat + gg.transpose()*(E * vecT.transpose() + E * vecV1.transpose());
+		Eigen::MatrixXd temp = Eigen::MatrixXd(negSamples, dim);
+		Eigen::VectorXd EE = Eigen::VectorXd::Ones(dim);
+		negMat = negMat + (gg*EE.transpose()).cwiseProduct(E * vecT.transpose() + E * vecV1.transpose());
 		double *negData = negMat.data();
 		for (int i = 0; i < negSamples; i++) {
 			for (int j = 0; j < dim; j++) {
 				if (flag == 0) {
-					(*itemArgs[negs[i].getItem()])[j] = negData[(i - 1) * 10 + j];
+					(*itemArgs[negs[i].getItem()])[j] = negData[i * 10 + j];
 				}
 				else if (flag == 1) {
-					(*userArgs[negs[i].getUser()])[j] = negData[(i - 1) * 10 + j];
+					(*userArgs[negs[i].getUser()])[j] = negData[i * 10 + j];
 				}
 				else {
 					cout << "update error3" << endl;
